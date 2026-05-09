@@ -1,14 +1,41 @@
 import { useState } from "react";
 import reactLogo from "./assets/react.svg";
 import viteLogo from "./assets/vite.svg";
-import heroImg from "./assets/hero.png";
 import yopo from "./assets/yopo.jpg";
 import "./App.css";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import { useEffect } from "react";
 
 function App() {
+  const greeting = import.meta.env.VITE_GREETING;
   const [count, setCount] = useState(0);
+
+  // Use this state variable in the UI
+  const [ipAddress, setIpAddress] = useState("");
+
+  useEffect(() => {
+    const fetchIpAddress = async () => {
+      // Use the environment variable here
+      const apiUrl = import.meta.env.VITE_API_URL;
+
+      try {
+        const response = await fetch(`${apiUrl}?format=json`);
+
+        if (!response.ok) {
+          throw new Error(`API error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setIpAddress(data.ip);
+      } catch (err) {
+        setIpAddress("NOT AVAILABLE");
+        console.log(err.message);
+      }
+    };
+
+    fetchIpAddress();
+  }, []);
 
   return (
     <>
@@ -20,7 +47,8 @@ function App() {
           <img src={viteLogo} className="vite" alt="Vite logo" />
         </div>
         <div>
-          <h1>Get started</h1>
+          <h1>{greeting}</h1>
+          <h3>Your IP is {ipAddress}</h3>
           <p>
             Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
           </p>
